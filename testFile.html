@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="file" onChange="uploadfile(this)" id="imgInput">
+<script>
+    function uploadfile() {
+        var self = this;
+        var src = document.getElementById('imgInput');
+        var file = src.files[0];
+        if(!file){return false;}
+        if (!file) return false;
+        var fName = '';
+
+        // var fSize = rst.base64Len;
+
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            console.log(evt.target.result)//即图片，此处可进行预览操作
+            let fSize = evt.target.result.length;
+
+
+            console.log(evt.target.result.length)
+
+            // let str = "hhh";
+            // for (var i = 0; i < 25000; i++) {
+            //     str += i;
+            // }
+            // fSize = str.length;
+
+
+            var object = JSON.stringify({
+                name: fName, size: fSize, base64: evt.target.result
+            });
+
+            // object = JSON.stringify({id: 123})
+
+            // var fileId = UUID.v1();
+            var xhr = new XMLHttpRequest();
+            // src.attr("fileId", fileId);
+            xhr.addEventListener("load", function (evt) {
+                console.log(evt);
+                // self.uploadFormImageSuccess(evt, src,item,index);
+            }, false);
+            xhr.addEventListener("error", function (evt) {
+                console.error(evt);
+                // self.uploadFormImageError(evt, src);
+            }, false);
+
+            var fd = new FormData();
+            fd.append('upload', file);
+            fd.append('obj1', object);
+            fd.append('fileName', fName);
+            fd.append('type', 'uploadFileToOss');
+            fd.append('module', 'newMediaImage');
+            // fd.append('sessionId', Cache.nodeSession.id);
+            fd.append('sessionId', 'sessionId');
+            xhr.open("POST", "http://127.0.0.1:3000");
+            // xhr.setRequestHeader("content-type", "application/json")
+            xhr.send(fd);
+        }
+        reader.readAsDataURL(file);
+    }
+</script>
+</body>
+</html>
